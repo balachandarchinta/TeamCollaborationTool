@@ -7,7 +7,8 @@ import { socket } from '@/lib/socket';
 import axios from 'axios';
 import { Zap, Layout, Bell, Settings } from 'lucide-react';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_URL = `${BASE_URL.replace(/\/$/, '')}/api`;
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
