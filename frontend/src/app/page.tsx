@@ -7,39 +7,28 @@ import { socket } from '@/lib/socket';
 import axios from 'axios';
 import { Zap, Layout, Bell, Settings } from 'lucide-react';
 
+// IMPORTANT: Use the relative path so the Proxy works!
 const API_URL = '/api';
 
-// This wrapper handles the initial server-side load
-export default function HomeWrapper() {
-  const [initialTasks, setInitialTasks] = useState<Task[]>([]);
+export default function Home() {
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [isReady, setIsReady] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [notification, setNotification] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        // In Cloud Shell, we'll try to fetch from the public URL first
         const response = await axios.get(`${API_URL}/tasks`);
-        setInitialTasks(response.data);
+        setTasks(response.data);
       } catch (error) {
-        console.error('Fetch failed, starting with empty list');
+        console.error('Fetch failed', error);
       } finally {
         setIsReady(true);
       }
     };
     fetchTasks();
-  }, []);
 
-  if (!isReady) return <div className="min-h-screen bg-slate-50 flex items-center justify-center text-slate-400 font-medium">Initializing Dashboard...</div>;
-
-  return <DashboardContent initialTasks={initialTasks} />;
-}
-
-function DashboardContent({ initialTasks }: { initialTasks: Task[] }) {
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
-  const [isLoading, setIsLoading] = useState(false);
-  const [notification, setNotification] = useState<string | null>(null);
-
-  useEffect(() => {
     socket.on('task_update', (newTask: Task) => {
       setTasks(prev => [newTask, ...prev]);
       setNotification(newTask.userNotification);
@@ -59,6 +48,8 @@ function DashboardContent({ initialTasks }: { initialTasks: Task[] }) {
       setIsLoading(false);
     }
   };
+
+  if (!isReady) return <div className="min-h-screen bg-slate-50 flex items-center justify-center text-slate-400 font-medium">Initializing Dashboard...</div>;
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-blue-100">

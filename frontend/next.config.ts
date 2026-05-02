@@ -1,13 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  allowedDevOrigins: ['3000-cs-954975070295-default.cs-asia-southeast1-yelo.cloudshell.dev'],
+  /* Proxy all /api requests to the backend on port 3001 */
   async rewrites() {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:3001/api/:path*',
+        destination: 'http://127.0.0.1:3001/api/:path*',
       },
     ];
   },
