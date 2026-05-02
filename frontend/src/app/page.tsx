@@ -10,24 +10,24 @@ import { Zap, Layout, Bell, Settings } from 'lucide-react';
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 const API_URL = `${BASE_URL.replace(/\/$/, '')}/api`;
 
-export default function Home() {
-  const [tasks, setTasks] = useState<Task[]>([]);
+export default async function Home() {
+  let initialTasks: Task[] = [];
+  try {
+    const response = await axios.get('http://localhost:3001/api/tasks');
+    initialTasks = response.data;
+  } catch (error) {
+    console.error('Initial fetch failed, falling back to empty list');
+  }
+
+  return <DashboardContent initialTasks={initialTasks} />;
+}
+
+function DashboardContent({ initialTasks }: { initialTasks: Task[] }) {
+  const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [isLoading, setIsLoading] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fetch initial tasks
-    const fetchTasks = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/tasks`);
-        setTasks(response.data);
-      } catch (error) {
-        console.error('Failed to fetch tasks', error);
-      }
-    };
-
-    fetchTasks();
-
     // Listen for real-time updates
     socket.on('task_update', (newTask: Task) => {
       setTasks(prev => [newTask, ...prev]);
