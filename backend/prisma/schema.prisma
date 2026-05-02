@@ -1,0 +1,24 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Task {
+  id               Int      @id @default(autoincrement())
+  originalMessage  String
+  action           String
+  priority         String
+  taskName         String
+  dueDate          String?
+  assignee         String?
+  dependency       String?
+  status           String
+  userNotification String
+  auditSummary     String
+  systemActions    String
+  createdAt        DateTime @default(now())
+}
