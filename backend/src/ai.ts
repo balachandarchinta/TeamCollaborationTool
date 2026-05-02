@@ -1,6 +1,7 @@
+import 'dotenv/config';
 import { GoogleGenAI, Type } from '@google/genai';
 
-const ai = new GoogleGenAI();
+const ai = new GoogleGenAI(process.env.GOOGLE_GENAI_API_KEY || '');
 
 export const extractTaskDetails = async (input: string) => {
   const systemInstruction = `Role: You are a specialized Workflow & Task Orchestration Engine. Your purpose is to ingest unstructured team communication and transform it into a structured task schema for a project management dashboard.
@@ -15,7 +16,7 @@ Dependency Mapping: Only link tasks if explicit "waiting on" or "after" language
 Output Format: Return ONLY a JSON object. No prose.`;
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-pro',
+    model: 'gemini-1.5-flash',
     contents: input,
     config: {
       systemInstruction,
@@ -61,7 +62,7 @@ Tone: Professional, supportive, and clarity-driven.
 Format: Output ONLY valid JSON.`;
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-pro',
+    model: 'gemini-1.5-flash',
     contents: JSON.stringify(stage1Output),
     config: {
       systemInstruction,
